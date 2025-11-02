@@ -23,28 +23,33 @@ const tick = async (ms: AppEvents["timer:tick"]) => {
   console.log(`Tick after ${ms}ms`);
 };
 
+// 普通监听器
 emitter.on("user:greet", greet);
 emitter.on("math:add", addNumbers);
 emitter.on("timer:tick", tick);
 
+// 全局监听器示例 - 监听所有事件
+const globalListener = (data: AppEvents[keyof AppEvents]) => {
+  console.log("🔔 [全局监听] 事件被触发，数据:", data);
+};
+
+emitter.onAll(globalListener);
+
+// once 监听器示例 - 只执行一次
+const onceGreet = ({ name }: AppEvents["user:greet"]) => {
+  console.log(`⭐ [一次性监听] Hello, ${name}! (这只会执行一次)`);
+};
+
+emitter.once("user:greet", onceGreet);
+
 async function runExample() {
   emitter.emit("user:greet", { name: "Holly" });
-
-  const results = await emitter.emit("math:add", { a: 2, b: 3 });
-  console.log("Received async results:", results);
-
-  emitter.emit("timer:tick", 500).then((results) => {
-    console.log("Received async results:", results);
-  }).catch((error) => {
-    console.error("Error:", error);
-  });
-
-  emitter.off("user:greet", greet);
-  emitter.emit("user:greet", { name: "Emitter" }).then((results) => {
-    console.log("Received async results:", results);
-  }).catch((error) => {
-    console.error("Error:", error);
-  });
+  emitter.emit("user:greet", { name: "Second" });
+  
+  // 移除全局监听器
+  console.log("\n=== 移除全局监听器后 ===");
+  emitter.offAll(globalListener);
+  emitter.emit("user:greet", { name: "Final" });
 }
 
 runExample();

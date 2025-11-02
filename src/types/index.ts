@@ -5,6 +5,9 @@ export interface EventEmitter<T extends Record<string, unknown>> {
   emit<K extends keyof T>(event: K, data: T[K]): Promise<unknown[]>;
   on<K extends keyof T>(event: K, handler: EventHandler<T[K]>): void;
   off<K extends keyof T>(event: K, handler: EventHandler<T[K]>): void;
+  onAll(handler: EventHandler<T[keyof T]>): void;
+  offAll(handler: EventHandler<T[keyof T]>): void;
+  once<K extends keyof T>(event: K, handler: EventHandler<T[K]>): void;
 }
 
 /**
